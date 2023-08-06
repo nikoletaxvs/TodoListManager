@@ -29,6 +29,10 @@ namespace TodoListManager.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("TodoId")
                         .HasColumnType("int");
 
@@ -36,7 +40,7 @@ namespace TodoListManager.Migrations
 
                     b.HasIndex("TodoId");
 
-                    b.ToTable("Item");
+                    b.ToTable("Items");
                 });
 
             modelBuilder.Entity("TodoListManager.Models.Todo", b =>
@@ -53,7 +57,7 @@ namespace TodoListManager.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Todo");
+                    b.ToTable("Todos");
                 });
 
             modelBuilder.Entity("TodoListManager.Models.Item", b =>
