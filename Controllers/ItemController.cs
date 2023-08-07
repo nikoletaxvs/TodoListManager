@@ -72,7 +72,6 @@ namespace TodoListManager.Controllers
                 return StatusCode(500, ModelState);
             }
 
-
             return Ok("Successfully Created");
         }
 
