@@ -26,23 +26,32 @@ namespace TodoListManager.Controllers
             }
             return Ok(todos);   
         }
-        [HttpGet("{Id}")]
-        [ProducesResponseType(200,Type =typeof(Todo))]
-        [ProducesResponseType(400)]
-        public IActionResult GetTodo(int id)
+        //[HttpGet("{Id}")]
+        //[ProducesResponseType(200,Type =typeof(Todo))]
+        //[ProducesResponseType(400)]
+        //public IActionResult GetTodo(int id)
+        //{
+        //    if (!_todoRepository.TodoExists(id))
+        //    {
+        //        return NotFound();
+        //    }
+        //    var todo =_todoRepository.GetTodo(id);
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+        //    return Ok(todo);    
+        //}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Todo>> GetTodo(int id)
         {
-            if (!_todoRepository.TodoExists(id))
+            var todo = await _todoRepository.GetTodoByIdAsync(id);
+            if (todo == null)
             {
                 return NotFound();
             }
-            var todo =_todoRepository.GetTodo(id);
-            if(!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            return Ok(todo);    
+            return Ok(todo);
         }
-
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -75,6 +84,38 @@ namespace TodoListManager.Controllers
 
             return Ok("Successfully Created");
         }
+
+        [HttpPut("TodoId")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateTodo(int todoId, [FromBody]Todo updatedTodo)
+        {
+            if(updatedTodo == null)
+            {
+                return BadRequest(ModelState);
+            }
+            if(todoId != updatedTodo.Id)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_todoRepository.TodoExists(todoId))
+            {
+                return NotFound();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var newTodo = new Todo();
+            if (!_todoRepository.UpgradeTodo(updatedTodo))
+            {
+                ModelState.AddModelError("", "Something went wrong updating!");
+                return StatusCode(500,ModelState);
+            }
+            return NoContent();
+        }
     }
 }
-
+  

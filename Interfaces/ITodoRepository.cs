@@ -5,9 +5,10 @@ namespace TodoListManager.Interfaces
     public interface ITodoRepository
     {
         ICollection<Todo> GetTodos();
-        Todo GetTodo(int id);
+        Task<Todo> GetTodoByIdAsync(int id);
         bool TodoExists(int id);
         bool CreateTodo(Todo todo);
+        bool UpgradeTodo(Todo todo);
         bool Save();
     }
 }
