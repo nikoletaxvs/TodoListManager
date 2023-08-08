@@ -10,14 +10,14 @@ namespace TodoListManager.Controllers
     public class ItemController : Controller
     {
         private readonly IItemRepository _itemRepository;
-        public ItemController(ItemRepository itemRepository)
+        public ItemController(IItemRepository itemRepository)
         {
             _itemRepository = itemRepository;
         }
 
         [HttpGet("{TodoId}/Items")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Item>))]
-        public IActionResult GetTodos(int todoId)
+        public IActionResult GetItems(int todoId)
         {
             var items = _itemRepository.GetItemsOfTodo(todoId);
             if (!ModelState.IsValid)
