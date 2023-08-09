@@ -13,23 +13,21 @@ namespace TodoListManager.Repositories
             _context= context;
         }
 
-        public bool CreateTodo(Todo todo)
+       
+        public async Task CreateTodo(Todo todo)
         {
             _context.Add(todo);
-            return Save();
+            await _context.SaveChangesAsync();
         }
 
-        //public Todo GetTodo(int id)
-        //{
-        //    return _context.Todos.Where(t => t.Id == id).FirstOrDefault();
-        //}
+
         public async Task<Todo> GetTodoByIdAsync(int id)
         {
             return await _context.Todos.Include(t => t.Items).FirstOrDefaultAsync(t => t.Id == id);
         }
         public ICollection<Todo> GetTodos()
         {
-            return _context.Todos.OrderBy(t => t.Id).ToList();
+            return _context.Todos.Include(t => t.Items).OrderBy(t => t.Id).ToList();
         }
 
         public bool Save()
@@ -43,10 +41,35 @@ namespace TodoListManager.Repositories
             return _context.Todos.Any(t => t.Id == id);
         }
 
-        public bool UpgradeTodo(Todo todo)
+       
+        public async Task<bool> UpdateTodo(Todo todo)
         {
-            _context.Update(todo);
-            return Save();
+            _context.Entry(todo).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TodoExists(todo.Id))
+                {
+                    return false;
+                }
+                throw;
+            }
+            return true;
+        }
+        public async Task<bool> DeleteTodoAndItemsAsync(int id)
+        {
+            var todo = await _context.Todos.Include(t => t.Items).FirstOrDefaultAsync(t => t.Id == id);
+            if (todo == null)
+            {
+                return false;
+            }
+
+            _context.Todos.Remove(todo);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

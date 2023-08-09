@@ -52,39 +52,44 @@ namespace TodoListManager.Controllers
             }
             return Ok(todo);
         }
+        //[HttpPost]
+        //[ProducesResponseType(204)]
+        //[ProducesResponseType(400)]
+        //public IActionResult CreateTodo([FromBody] Todo todoCreate)
+        //{
+        //    if(todoCreate == null)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+        //    var todo = _todoRepository.GetTodos()
+        //        .Where(t =>t.Title.Trim().ToUpper() == todoCreate.Title.TrimEnd().ToUpper())
+        //        .FirstOrDefault();
+        //    if(todo != null)
+        //    {
+        //        ModelState.AddModelError("", "Todo already exists");
+        //        return StatusCode(422,ModelState);
+        //    }
+
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+        //    var newTodo = new Todo();
+        //    newTodo = todoCreate;
+        //    if (!_todoRepository.CreateTodo(newTodo))
+        //    {
+        //        ModelState.AddModelError("", "Something went wrong while saving");
+        //        return StatusCode(500,ModelState);
+        //    }
+
+        //    return Ok("Successfully Created");
+        //}
         [HttpPost]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        public IActionResult CreateTodo([FromBody] Todo todoCreate)
+        public async Task<ActionResult<Todo>> CreateTodo(Todo todo)
         {
-            if(todoCreate == null)
-            {
-                return BadRequest(ModelState);
-            }
-            var todo = _todoRepository.GetTodos()
-                .Where(t =>t.Title.Trim().ToUpper() == todoCreate.Title.TrimEnd().ToUpper())
-                .FirstOrDefault();
-            if(todo != null)
-            {
-                ModelState.AddModelError("", "Todo already exists");
-                return StatusCode(422,ModelState);
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var newTodo = new Todo();
-            newTodo = todoCreate;
-            if (!_todoRepository.CreateTodo(newTodo))
-            {
-                ModelState.AddModelError("", "Something went wrong while saving");
-                return StatusCode(500,ModelState);
-            }
-
-            return Ok("Successfully Created");
+            await _todoRepository.CreateTodo(todo);
+            return CreatedAtAction(nameof(GetTodo), new { id = todo.Id }, todo);
         }
-
         [HttpPut("TodoId")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
@@ -109,11 +114,22 @@ namespace TodoListManager.Controllers
             }
 
             var newTodo = new Todo();
-            if (!_todoRepository.UpgradeTodo(updatedTodo))
+            //if (!_todoRepository.UpgradeTodo(updatedTodo))
+            //{
+            //    ModelState.AddModelError("", "Something went wrong updating!");
+            //    return StatusCode(500,ModelState);
+            //}
+            return NoContent();
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTodoAndItems(int id)
+        {
+            var deleted = await _todoRepository.DeleteTodoAndItemsAsync(id);
+            if (!deleted)
             {
-                ModelState.AddModelError("", "Something went wrong updating!");
-                return StatusCode(500,ModelState);
+                return NotFound();
             }
+
             return NoContent();
         }
     }

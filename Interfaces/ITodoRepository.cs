@@ -7,8 +7,9 @@ namespace TodoListManager.Interfaces
         ICollection<Todo> GetTodos();
         Task<Todo> GetTodoByIdAsync(int id);
         bool TodoExists(int id);
-        bool CreateTodo(Todo todo);
-        bool UpgradeTodo(Todo todo);
+        Task CreateTodo(Todo todo);
+        Task<bool> UpdateTodo(Todo todo);
+        Task<bool> DeleteTodoAndItemsAsync(int id);
         bool Save();
     }
 }
