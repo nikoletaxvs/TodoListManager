@@ -79,6 +79,55 @@ namespace TodoListManager.Controllers
                 return BadRequest("Invalid model state");
             }
         }
+        
+        [Route("Login")]
+        [HttpPost]
+        public async Task<IActionResult> Login([FromBody] UserLoginRequestDto loginRequest)
+        {
+            if(ModelState.IsValid) { 
+                //Check if email exists
+                var existing_user = await _userManager.FindByEmailAsync(loginRequest.Email);
+                if(existing_user == null)
+                {
+                    return BadRequest(new AuthResult()
+                    {
+                        Result = false,
+                        Errors = new List<string>()
+                        {
+                            "Invalid payload"
+                        }
+                    });
+                }
+
+                var isCorrect = await _userManager.CheckPasswordAsync(existing_user, loginRequest.Password);
+                if (!isCorrect)
+                {
+                    return BadRequest(new AuthResult()
+                    {
+                        Result = false,
+                        Errors = new List<string>()
+                        {
+                            "Invalid Credentials"
+                        }
+                    });
+                }
+                var jwtTokenString = GenerateJwtToken(existing_user);
+                return Ok(new AuthResult()
+                {
+                    Result = true,
+                    Token= jwtTokenString
+                });
+            }
+
+            return BadRequest(new AuthResult()
+            {
+                Errors= new List<string>()
+                {
+                    "Invalid payload"
+                },
+                Result = false
+            });
+        }
         private string GenerateJwtToken(IdentityUser user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
