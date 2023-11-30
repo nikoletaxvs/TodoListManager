@@ -34,8 +34,9 @@ namespace TodoListManager.Controllers
             //validate incoming request
             if(ModelState.IsValid)
             {
-                //We need to check if the email alrready exists
+                //We need to check if the email already exists
                 var user_exists = await _userManager.FindByEmailAsync(requestDto.Email);
+                //if the user exists , return BadRequest()
                 if (user_exists != null)
                 {
                     return BadRequest(new AuthResult()
@@ -70,7 +71,10 @@ namespace TodoListManager.Controllers
                     Result = false,
                     Errors = new List<string>()
                     {
-                        "Server Error"
+                        "Server Error,try checking that the password had:" +
+                        " 1.uppercase," +
+                        " 2.alphanumeric " +
+                        "and 3.characters!"
                     }
                 });
             }
@@ -128,6 +132,7 @@ namespace TodoListManager.Controllers
                 Result = false
             });
         }
+       
         private string GenerateJwtToken(IdentityUser user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
