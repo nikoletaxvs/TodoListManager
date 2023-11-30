@@ -89,8 +89,10 @@ namespace TodoListManager.Controllers
         public async Task<IActionResult> Login([FromBody] UserLoginRequestDto loginRequest)
         {
             if(ModelState.IsValid) { 
-                //Check if email exists
+                //Find user by email
                 var existing_user = await _userManager.FindByEmailAsync(loginRequest.Email);
+
+                //If that user doesn't exist , return BadRequest-400
                 if(existing_user == null)
                 {
                     return BadRequest(new AuthResult()
@@ -103,7 +105,10 @@ namespace TodoListManager.Controllers
                     });
                 }
 
+                //Check if that password is correct for the user found
                 var isCorrect = await _userManager.CheckPasswordAsync(existing_user, loginRequest.Password);
+                
+                //If the password is wrong return BadRequest-400
                 if (!isCorrect)
                 {
                     return BadRequest(new AuthResult()
@@ -115,6 +120,8 @@ namespace TodoListManager.Controllers
                         }
                     });
                 }
+
+                //Generate a JWT Token , and return ok-200
                 var jwtTokenString = GenerateJwtToken(existing_user);
                 return Ok(new AuthResult()
                 {

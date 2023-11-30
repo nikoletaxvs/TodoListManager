@@ -11,6 +11,7 @@ namespace TodoListManager.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TodosController : Controller
     {
         private readonly ITodoRepository _todoRepository;

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TodoListManager.Interfaces;
 using TodoListManager.Models;
 using TodoListManager.Repositories;
@@ -7,6 +8,7 @@ namespace TodoListManager.Controllers
 {
     [Route("api/Todos")]
     [ApiController]
+    [Authorize]
     public class ItemController : Controller
     {
         private readonly IItemRepository _itemRepository;
