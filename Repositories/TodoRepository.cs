@@ -42,7 +42,7 @@ namespace TodoListManager.Repositories
         }
 
        
-        public async Task<bool> UpdateTodo(Todo todo)
+        public async Task<bool> UpdateTodoAsync(Todo todo)
         {
             _context.Entry(todo).State = EntityState.Modified;
             try

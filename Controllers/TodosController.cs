@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using TodoListManager.Data;
 using TodoListManager.Interfaces;
 using TodoListManager.Models;
+using TodoListManager.Repositories;
 
 namespace TodoListManager.Controllers
 {
@@ -97,13 +98,13 @@ namespace TodoListManager.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateTodo(int todoId, [FromBody]Todo updatedTodo)
+        public async Task<IActionResult> UpdateTodo(int todoId, [FromBody]Todo updatedTodo)
         {
-            if(updatedTodo == null)
+            if (updatedTodo == null)
             {
                 return BadRequest(ModelState);
             }
-            if(todoId != updatedTodo.Id)
+            if (todoId != updatedTodo.Id)
             {
                 return BadRequest(ModelState);
             }
@@ -111,18 +112,30 @@ namespace TodoListManager.Controllers
             {
                 return NotFound();
             }
-            if (!ModelState.IsValid)
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest();
+            //}
+
+            if (todoId != updatedTodo.Id)
             {
                 return BadRequest();
             }
 
-            var newTodo = new Todo();
+            var updated = await _todoRepository.UpdateTodoAsync(updatedTodo);
+            if (!updated)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+            //var newTodo = new Todo();
             //if (!_todoRepository.UpgradeTodo(updatedTodo))
             //{
             //    ModelState.AddModelError("", "Something went wrong updating!");
             //    return StatusCode(500,ModelState);
             //}
-            return NoContent();
+            //return NoContent();
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTodoAndItems(int id)

@@ -8,7 +8,7 @@ namespace TodoListManager.Interfaces
         Task<Todo> GetTodoByIdAsync(int id);
         bool TodoExists(int id);
         Task CreateTodo(Todo todo);
-        Task<bool> UpdateTodo(Todo todo);
+        Task<bool> UpdateTodoAsync(Todo todo);
         Task<bool> DeleteTodoAndItemsAsync(int id);
         bool Save();
     }
